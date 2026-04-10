@@ -2,20 +2,17 @@
 // THE MOVEMENT — Main Game Script
 // ============================================================
 
-// ---- Fullscreen scaling ----
-function fitGameToScreen() {
-  const el = document.getElementById('gameContainer')
-  if (!el) return
-  const scale = Math.min(window.innerWidth / 1024, window.innerHeight / 576)
-  const left  = (window.innerWidth  - 1024 * scale) / 2
-  const top   = (window.innerHeight - 576  * scale) / 2
-  el.style.transform       = `scale(${scale})`
-  el.style.transformOrigin = '0 0'
-  el.style.left            = Math.floor(left) + 'px'
-  el.style.top             = Math.floor(top)  + 'px'
+// ---- Canvas resize ----
+function resizeCanvas() {
+  canvas.width  = window.innerWidth
+  canvas.height = window.innerHeight
+  // Re-centre player sprite if the game is already running
+  if (player) {
+    player.position.x = canvas.width  / 2 - 192 / 4 / 2
+    player.position.y = canvas.height / 2 - 68  / 2
+  }
 }
-window.addEventListener('resize', fitGameToScreen)
-fitGameToScreen()
+window.addEventListener('resize', resizeCanvas)
 
 // ---- Native fullscreen (mobile) ----
 function enterFullscreen() {
@@ -63,8 +60,8 @@ window.villagerTotal = 0
 // ---- Canvas setup ----
 const canvas = document.querySelector('canvas')
 const c      = canvas.getContext('2d')
-canvas.width  = 1024
-canvas.height = 576
+canvas.width  = window.innerWidth
+canvas.height = window.innerHeight
 
 // ---- Player sprites ----
 const playerDownImage  = new Image(); playerDownImage.src  = './img/playerDown.png'

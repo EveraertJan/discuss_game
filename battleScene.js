@@ -279,7 +279,7 @@ function initDebate(character) {
   // NPC on the right — rendered as its static tile from the tilemap (16 × 6 = 96 px)
   const BATTLE_TILE_PX = TILE_SIZE * 6  // 96px
   npcDebateSprite = {
-    position: { x: 800, y: 80 },
+    position: { x: Math.round(canvas.width * 0.78), y: Math.round(canvas.height * 0.14) },
     draw() {
       if (_tilemapImg && character.tileX !== null) {
         c.imageSmoothingEnabled = false
@@ -296,7 +296,7 @@ function initDebate(character) {
 
   // Player on the left (where Emby was)
   playerDebateSprite = new Sprite({
-    position: { x: 280, y: 325 },
+    position: { x: Math.round(canvas.width * 0.27), y: Math.round(canvas.height * 0.56) },
     image: playerDownImage,
     frames: { max: 3, hold: 10 },
     animate: false,
@@ -321,7 +321,8 @@ function initDebate(character) {
 // ---- Battle render loop (canvas) ----
 function animateBattle() {
   battleAnimationId = window.requestAnimationFrame(animateBattle)
-  battleBackground.draw()
+  // Draw background stretched to fill whatever canvas size we have
+  c.drawImage(battleBackgroundImage, 0, 0, canvas.width, canvas.height)
   debateRenderedSprites.forEach((sprite) => sprite.draw())
 }
 
