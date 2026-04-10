@@ -43,7 +43,7 @@ function getChildren(nodeId) {
 
 function getRootClaims() {
   if (!window.argumentData) return []
-  return window.argumentData.nodes.filter((n) => n.parentId === null)
+  return window.argumentData.nodes.filter(n => n.parentId === null && n.type === 'claim')
 }
 
 // ---- Conviction bar helpers ----
