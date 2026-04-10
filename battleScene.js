@@ -57,6 +57,12 @@ function setConviction(value) {
   })
 }
 
+// ---- Responsive font sizes ----
+// Returns the landscape value when the display is wider than it is tall.
+function uiSz(portrait, landscape) {
+  return window.innerWidth > window.innerHeight ? landscape : portrait
+}
+
 // ---- UI helper: show NPC statement ----
 // onReady: optional callback, called when player clicks to continue
 function showNPCStatement(node, onReady) {
@@ -71,12 +77,12 @@ function showNPCStatement(node, onReady) {
   box.style.display = 'block'
   box.onclick = null
   box.innerHTML = `
-    <div style="font-size: 7px; color: #aaa; letter-spacing: 1px; margin-bottom: 8px;">
+    <div style="font-size: ${uiSz('7px','11px')}; color: #aaa; letter-spacing: 1px; margin-bottom: 8px;">
       ${nameLabel} ARGUES:
     </div>
-    <div style="font-size: 9px; line-height: 1.8; color: #222;">${node.label}</div>
+    <div style="font-size: ${uiSz('9px','14px')}; line-height: 1.8; color: #222;">${node.label}</div>
     ${onReady
-      ? '<div style="font-size: 7px; color: #bbb; margin-top: 10px; text-align: right;">[ click to respond ]</div>'
+      ? `<div style="font-size: ${uiSz('7px','10px')}; color: #bbb; margin-top: 10px; text-align: right;">[ click to respond ]</div>`
       : ''}
   `
 
@@ -104,7 +110,7 @@ function showPlayerOptions(parentNodeId) {
   children.slice(0, 4).forEach((child) => {
     const button = document.createElement('button')
     button.innerHTML =
-      `<span style="font-size: 7px; line-height: 1.5; color: #222;">${child.label}</span>`
+      `<span style="font-size: ${uiSz('7px','12px')}; line-height: 1.5; color: #222;">${child.label}</span>`
     button.addEventListener('click', () => onPlayerResponds(child))
     document.querySelector('#attacksBox').append(button)
   })
@@ -124,16 +130,16 @@ function onPlayerResponds(node) {
   box.style.display = 'block'
   box.onclick = null
   box.innerHTML = `
-    <div style="font-size: 7px; color: #1976D2; letter-spacing: 1px; margin-bottom: 8px;">YOU SAY:</div>
-    <div style="font-size: 9px; line-height: 1.8; color: #222;">${node.label}</div>
+    <div style="font-size: ${uiSz('7px','11px')}; color: #1976D2; letter-spacing: 1px; margin-bottom: 8px;">YOU SAY:</div>
+    <div style="font-size: ${uiSz('9px','14px')}; line-height: 1.8; color: #222;">${node.label}</div>
   `
 
   // Fallacy — the NPC calls it out and the debate ends immediately
   if (node.type === 'fallacy') {
     setTimeout(() => {
       box.innerHTML = `
-        <div style="font-size: 8px; color: #e53935; margin-bottom: 8px;">⚠ LOGICAL FALLACY</div>
-        <div style="font-size: 9px; line-height: 1.8; color: #555;">
+        <div style="font-size: ${uiSz('8px','12px')}; color: #e53935; margin-bottom: 8px;">⚠ LOGICAL FALLACY</div>
+        <div style="font-size: ${uiSz('9px','14px')}; line-height: 1.8; color: #555;">
           The villager sees through it. The debate is over.
         </div>
       `
@@ -160,8 +166,8 @@ function onPlayerResponds(node) {
       // No counter — unanswerable point!
       setConviction(convictionLevel + GAIN_UNANSWERED)
       box.innerHTML = `
-        <div style="font-size: 8px; color: #4CAF50; margin-bottom: 8px;">💡 UNANSWERABLE POINT!</div>
-        <div style="font-size: 9px; line-height: 1.8; color: #555;">
+        <div style="font-size: ${uiSz('8px','12px')}; color: #4CAF50; margin-bottom: 8px;">💡 UNANSWERABLE POINT!</div>
+        <div style="font-size: ${uiSz('9px','14px')}; line-height: 1.8; color: #555;">
           The villager has no counter to that argument.
         </div>
       `
@@ -210,14 +216,14 @@ function winDebate() {
   box.style.display = 'block'
   box.onclick = null
   box.innerHTML = `
-    <div style="font-size: 12px; color: #4CAF50; line-height: 2.2;">
+    <div style="font-size: ${uiSz('12px','18px')}; color: #4CAF50; line-height: 2.2;">
       ✓ CONVINCED!
     </div>
-    <div style="font-size: 9px; color: #333; line-height: 1.8;">
+    <div style="font-size: ${uiSz('9px','14px')}; color: #333; line-height: 1.8;">
       ${currentDebateNPC ? currentDebateNPC.name : 'The villager'} joins the movement!
     </div>
     ${isFirstWin ? `
-    <div style="font-size: 7px; color: #888; line-height: 2; margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px;">
+    <div style="font-size: ${uiSz('7px','11px')}; color: #888; line-height: 2; margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px;">
       Convinced citizens gather at the protest in front of the factory.
     </div>` : ''}
   `
@@ -233,8 +239,8 @@ function loseDebate() {
   box.style.display = 'block'
   box.onclick = null
   box.innerHTML = `
-    <div style="font-size: 10px; color: #e53935; line-height: 2.2;">Not yet...</div>
-    <div style="font-size: 9px; color: #555; line-height: 1.8;">
+    <div style="font-size: ${uiSz('10px','15px')}; color: #e53935; line-height: 2.2;">Not yet...</div>
+    <div style="font-size: ${uiSz('9px','14px')}; color: #555; line-height: 1.8;">
       Keep working on your arguments. Come back and try again!
     </div>
   `

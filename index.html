@@ -137,6 +137,14 @@
       height: 100%;
     }
 
+    /* ---- Landscape: bigger text, taller panel ---- */
+    @media (orientation: landscape) {
+      #debatePanel  { min-height: 400px; }
+      #dialogueBox  { font-size: 14px !important; }
+      #attacksBox button { font-size: 12px; }
+      #npcName      { font-size: 18px; }
+    }
+
     /* ---- Debate button overrides ---- */
     #attacksBox button {
       font-family: 'Press Start 2P', cursive;
@@ -321,7 +329,7 @@
     </div>
 
     <!-- Bottom debate panel -->
-    <div style="
+    <div id="debatePanel" style="
       background:white; min-height:140px; position:absolute; bottom:0; left:0; right:0;
       border-top:4px black solid; display:flex;
     ">
