@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>The Movement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ---- Reset ---- */
+    *, *::before, *::after {
+      font-family: 'Press Start 2P', cursive;
+      box-sizing: border-box;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation; /* faster tap response */
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+
+    h1 { margin: 0; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    canvas {
+      display: block;
+      touch-action: none;
+    }
+
+    /* ---- Start Screen ---- */
+    #startScreen {
+      position: fixed;
+      inset: 0;
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      color: white;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    #startScreen .title {
+      font-size: clamp(16px, 5vw, 28px);
+      color: #4CAF50;
+      text-shadow: 3px 3px #1b5e20, 5px 5px #000;
+      letter-spacing: 4px;
+      text-align: center;
+    }
+
+    #startScreen .subtitle {
+      font-size: clamp(7px, 2vw, 10px);
+      color: #888;
+      text-align: center;
+      line-height: 2.2;
+    }
+
+    #fileDropZone {
+      border: 3px dashed #4CAF50;
+      padding: clamp(16px, 4vw, 24px) clamp(24px, 6vw, 48px);
+      color: #4CAF50;
+      font-size: clamp(8px, 2.5vw, 11px);
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #fileDropZone:active, #fileDropZone:hover {
+      background: rgba(76, 175, 80, 0.12);
+    }
+
+    #argumentFileInput { display: none; }
+
+    #fileStatus {
+      font-size: clamp(7px, 2vw, 9px);
+      color: #555;
+      min-height: 16px;
+    }
+
+    #fileStatus.loaded { color: #4CAF50; }
+
+    #startBtn {
+      background: #333;
+      color: #555;
+      padding: clamp(10px, 3vw, 14px) clamp(20px, 5vw, 32px);
+      font-size: clamp(10px, 3vw, 13px);
+      font-family: 'Press Start 2P', cursive;
+      cursor: not-allowed;
+      border: 3px solid #333;
+      pointer-events: none;
+    }
+
+    #startBtn.ready {
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      border-color: #2e7d32;
+      pointer-events: all;
+    }
+
+    #startBtn.ready:active, #startBtn.ready:hover {
+      background: #388E3C;
+    }
+
+    #startScreen .hint {
+      font-size: clamp(6px, 1.8vw, 8px);
+      color: #333;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    /* ---- Game container (scaled to fill screen) ---- */
+    #gameContainer {
+      position: fixed;
+      width: 1024px;
+      height: 576px;
+      transform-origin: 0 0;
+      /* JS sets transform + left + top */
+    }
+
+    /* ---- Debate button overrides ---- */
+    #attacksBox button {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 7px;
+      line-height: 1.6;
+      text-align: left;
+      padding: 6px 8px;
+      border: 0;
+      border-right: 2px solid #eee;
+      border-bottom: 2px solid #eee;
+      background: white;
+      cursor: pointer;
+      word-break: break-word;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      height: auto;
+    }
+
+    #attacksBox button:active, #attacksBox button:hover {
+      background: #f0f0f0;
+    }
+
+    /* ---- Virtual D-pad (fixed, always on top) ---- */
+    #touchControls {
+      display: none; /* shown via JS after game starts */
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    .dpad-wrap {
+      position: absolute;
+      bottom: max(24px, env(safe-area-inset-bottom, 24px));
+      left: max(20px, env(safe-area-inset-left, 20px));
+      width: 150px;
+      height: 150px;
+      pointer-events: all;
+    }
+
+    .dpad-btn {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      background: rgba(255,255,255,0.18);
+      border: 2px solid rgba(255,255,255,0.35);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.85);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .dpad-btn:active {
+      background: rgba(255,255,255,0.38);
+    }
+
+    #dpad-up    { top: 0;   left: 51px; }
+    #dpad-left  { top: 51px; left: 0;  }
+    #dpad-center { top: 51px; left: 51px; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); pointer-events: none; }
+    #dpad-right { top: 51px; left: 102px; }
+    #dpad-down  { top: 102px; left: 51px; }
+
+    .action-wrap {
+      position: absolute;
+      bottom: max(32px, env(safe-area-inset-bottom, 32px));
+      right: max(24px, env(safe-area-inset-right, 24px));
+      pointer-events: all;
+    }
+
+    #action-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(76, 175, 80, 0.75);
+      border: 3px solid rgba(76, 175, 80, 0.9);
+      color: white;
+      font-size: 8px;
+      font-family: 'Press Start 2P', cursive;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #action-btn:active {
+      background: rgba(56, 142, 60, 0.9);
+    }
+  </style>
+</head>
+
+<!-- ===================== START SCREEN ===================== -->
+<div id="startScreen">
+  <div class="title">THE MOVEMENT</div>
+  <div class="subtitle">
+    Explore the village. Talk to people.<br>
+    Convince them to join your cause.
+  </div>
+
+  <div id="fileStatus" style="font-size:clamp(7px,2vw,9px); color:#555;">loading arguments…</div>
+
+  <button id="startBtn">▶ START GAME</button>
+
+  <div class="hint">WASD / D-pad to move &nbsp;·&nbsp; SPACE / A to talk</div>
+
+  <div style="font-size:clamp(5px,1.4vw,7px); color:#333; text-align:center; line-height:2.6; margin-top:8px;">
+    based on <a href="https://github.com/chriscourses/pokemon-style-game" target="_blank"
+      style="color:#555; text-decoration:none;">chriscourses/pokemon-style-game</a>
+    &nbsp;·&nbsp;
+    assets <a href="https://kenney.nl/assets/rpg-urban-pack" target="_blank"
+      style="color:#555; text-decoration:none;">kenney.nl RPG Urban Pack</a>
+  </div>
+</div>
+
+<!-- ===================== GAME AREA (scaled) ===================== -->
+<div id="gameContainer">
+
+  <!-- Flash overlay -->
+  <div id="overlappingDiv" style="
+    background-color:black; position:absolute; inset:0;
+    opacity:0; pointer-events:none; z-index:10;
+  "></div>
+
+  <!-- Movement counter (top right) -->
+  <div id="movementCounter" style="
+    position:absolute; top:12px; right:12px;
+    background:white; border:4px black solid; padding:8px 14px;
+    z-index:20; display:flex; flex-direction:column; align-items:center; gap:5px;
+    min-width:120px;
+  ">
+    <div style="font-size:7px; color:#888; letter-spacing:1px;">JOINED</div>
+    <div id="movementCount" style="font-size:16px; color:#4CAF50;">0 of 0</div>
+  </div>
+
+  <canvas></canvas>
+
+  <!-- Victory screen -->
+  <div id="victoryScreen" style="
+    display:none; position:absolute; inset:0; z-index:50;
+    background:rgba(0,0,0,0.82);
+    flex-direction:column; align-items:center; justify-content:center;
+    gap:24px; padding:40px;
+  ">
+    <div style="font-size:clamp(14px,3vw,22px); color:#4CAF50;
+      text-shadow:3px 3px #1b5e20, 5px 5px #000; letter-spacing:3px; text-align:center;">
+      THE MOVEMENT IS COMPLETE
+    </div>
+    <div style="font-size:clamp(7px,1.5vw,10px); color:#aaa; line-height:2.4; text-align:center;">
+      Every villager has been convinced.<br>The movement grows.
+    </div>
+    <div style="font-size:clamp(9px,2vw,13px); color:#4CAF50;">
+      ✓ <span id="victoryCount"></span> convinced
+    </div>
+  </div>
+
+  <!-- Exploration dialogue box -->
+  <div id="characterDialogueBox" style="
+    background:white; height:140px; position:absolute; bottom:0; left:0; right:0;
+    border-top:4px black solid; display:none; padding:14px 16px;
+    font-size:10px; line-height:1.8; align-items:center; cursor:pointer;
+  ">
+    <div style="font-size:7px; color:#bbb; position:absolute; bottom:8px; right:12px;">tap / SPACE to continue</div>
+  </div>
+
+  <!-- ---- Debate UI ---- -->
+  <div id="userInterface" style="display:none">
+
+    <!-- NPC conviction bar -->
+    <div style="
+      background:white; width:260px; position:absolute; top:50px; left:50px;
+      border:4px black solid; padding:12px;
+    ">
+      <h1 id="npcName" style="font-size:14px; margin-bottom:6px;">Villager</h1>
+      <div style="font-size:7px; color:#aaa; letter-spacing:1px; margin-bottom:6px;">CONVICTION</div>
+      <div style="position:relative">
+        <div style="height:8px; background:#eee; border:1px solid #ddd;"></div>
+        <div id="npcConvictionBar" style="
+          height:8px; background:#4CAF50;
+          position:absolute; top:0; left:0; width:0%;
+        "></div>
+      </div>
+    </div>
+
+    <!-- Bottom debate panel -->
+    <div style="
+      background:white; min-height:140px; position:absolute; bottom:0; left:0; right:0;
+      border-top:4px black solid; display:flex;
+    ">
+      <!-- Dialogue overlay (click/tap to advance) -->
+      <div id="dialogueBox" style="
+        position:absolute; inset:0; background:white;
+        padding:14px 16px; display:none; cursor:pointer;
+        font-size:9px; line-height:1.8; overflow-y:auto;
+      "></div>
+
+      <!-- Argument buttons (full width, type hidden) -->
+      <div id="attacksBox" style="
+        width:100%; display:grid; grid-template-columns:repeat(2,1fr);
+      "></div>
+
+      <!-- ARG TYPE panel hidden — type is not shown to the player -->
+      <div id="attackType" style="display:none;"></div>
+    </div>
+  </div>
+</div><!-- #gameContainer -->
+
+<!-- ===================== TOUCH CONTROLS (fixed, not scaled) ===================== -->
+<div id="touchControls">
+  <!-- D-pad -->
+  <div class="dpad-wrap">
+    <button class="dpad-btn" id="dpad-up">▲</button>
+    <button class="dpad-btn" id="dpad-left">◀</button>
+    <div class="dpad-btn" id="dpad-center"></div>
+    <button class="dpad-btn" id="dpad-right">▶</button>
+    <button class="dpad-btn" id="dpad-down">▼</button>
+  </div>
+
+  <!-- Action / Talk button -->
+  <div class="action-wrap">
+    <button id="action-btn">TALK</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"
+  integrity="sha512-6+YN/9o9BWrk6wSfGxQGpt3EUK6XeHi6yeHV+TYD2GR0Sj/cggRpXr1BrAQf0as6XslxomMUxXp2vIl+fv0QRA=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"
+  integrity="sha512-H6cPm97FAsgIKmlBA4s774vqoN24V5gSQL4yBTDOY2su2DeXZVhQPxFK4P6GPdnZqM9fg1G3cMv5wD7e6cFLZQ=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="data/audio.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/tilemap.js"></script>
+<script src="classes.js"></script>
+<script src="index.js"></script>
+<script src="battleScene.js"></script>
+</html>
