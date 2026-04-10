@@ -80,7 +80,7 @@ function showNPCStatement(node, onReady) {
     <div style="font-size: ${uiSz('14px','11px')}; color: #aaa; letter-spacing: 1px; margin-bottom: 8px;">
       ${nameLabel} ARGUES:
     </div>
-    <div style="font-size: ${uiSz('14px','14px')}; line-height: 2; color: #222;">${node.label}</div>
+    <div style="font-size: ${uiSz('14px','10px')}; line-height: 2; color: #222;">${node.label}</div>
     ${onReady
       ? `<div style="font-size: ${uiSz('14px','10px')}; color: #bbb; margin-top: 10px; text-align: right;">[ click to respond ]</div>`
       : ''}
@@ -110,7 +110,7 @@ function showPlayerOptions(parentNodeId) {
   children.slice(0, 4).forEach((child) => {
     const button = document.createElement('button')
     button.innerHTML =
-      `<span style="font-size: ${uiSz('14px','12px')}; line-height: 2.2; color: #222;">${child.label}</span>`
+      `<span style="font-size: ${uiSz('14px','10px')}; line-height: 2; color: #222;">${child.label}</span>`
     button.addEventListener('click', () => onPlayerResponds(child))
     document.querySelector('#attacksBox').append(button)
   })
@@ -299,7 +299,7 @@ function initDebate(character) {
   const BATTLE_TILE_PX = Math.round(canvas.height * 0.18)
 
   npcDebateSprite = {
-    position: { x: Math.round(canvas.width * 0.78), y: Math.round(canvas.height * 0.15) },
+    position: { x: Math.round(canvas.width * 0.72), y: Math.round(canvas.height * 0.15) },
     draw() {
       if (_tilemapImg && character.tileX !== null) {
         c.imageSmoothingEnabled = false
