@@ -17,6 +17,17 @@ function fitGameToScreen() {
 window.addEventListener('resize', fitGameToScreen)
 fitGameToScreen()
 
+// ---- Native fullscreen (mobile) ----
+function enterFullscreen() {
+  const el = document.documentElement
+  try {
+    if      (el.requestFullscreen)       el.requestFullscreen()
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen()
+  } catch (_) {}
+  // Lock to landscape where supported (Android Chrome etc.)
+  try { screen.orientation.lock('landscape').catch(() => {}) } catch (_) {}
+}
+
 // ---- Argument files (loaded from GitHub) ----
 window.argumentData  = null   // set per-debate in battleScene.js
 window.argumentFiles = []     // all files fetched from the repo
@@ -119,6 +130,7 @@ function checkStartReady() {
 // ---- Start button ----
 document.querySelector('#startBtn').addEventListener('click', function () {
   if (!window.argumentFiles.length) return
+  enterFullscreen()
   document.querySelector('#startScreen').style.display = 'none'
   document.querySelector('#touchControls').style.display = 'block'
   try { audio.Map.play() } catch (_) {}
