@@ -118,12 +118,6 @@ function onPlayerResponds(node) {
     b.style.opacity = '0.5'
   })
 
-  // Award conviction
-  let gain = GAIN_CLAIM
-  if (node.type === 'objection') gain = GAIN_OBJECTION
-  else if (node.type === 'support') gain = GAIN_SUPPORT
-  setConviction(convictionLevel + gain)
-
   // Show what the player said
   const box = document.querySelector('#dialogueBox')
   document.querySelector('#attacksBox').replaceChildren()
@@ -133,6 +127,26 @@ function onPlayerResponds(node) {
     <div style="font-size: 7px; color: #1976D2; letter-spacing: 1px; margin-bottom: 8px;">YOU SAY:</div>
     <div style="font-size: 9px; line-height: 1.8; color: #222;">${node.label}</div>
   `
+
+  // Fallacy — the NPC calls it out and the debate ends immediately
+  if (node.type === 'fallacy') {
+    setTimeout(() => {
+      box.innerHTML = `
+        <div style="font-size: 8px; color: #e53935; margin-bottom: 8px;">⚠ LOGICAL FALLACY</div>
+        <div style="font-size: 9px; line-height: 1.8; color: #555;">
+          The villager sees through it. The debate is over.
+        </div>
+      `
+      setTimeout(() => finalizeDebate(), 2500)
+    }, 1800)
+    return
+  }
+
+  // Award conviction for non-fallacy responses
+  let gain = GAIN_CLAIM
+  if (node.type === 'objection') gain = GAIN_OBJECTION
+  else if (node.type === 'support') gain = GAIN_SUPPORT
+  setConviction(convictionLevel + gain)
 
   setTimeout(() => {
     if (convictionLevel >= 100) {
