@@ -290,6 +290,8 @@ function wouldCollide(dx, dy) {
 function animate() {
   animationId = window.requestAnimationFrame(animate)
 
+  c.clearRect(0, 0, canvas.width, canvas.height)
+
   // Fallback background when tilemap is unavailable
   if (!tilemapRenderer) {
     c.fillStyle = '#2d6a4f'

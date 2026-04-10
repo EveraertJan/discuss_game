@@ -289,9 +289,11 @@ function initDebate(character) {
   document.querySelector('#attacksBox').replaceChildren()
   document.querySelector('#attackType').innerHTML = '—'
 
-  // Build debate sprites
-  // NPC on the right — rendered as its static tile from the tilemap (16 × 6 = 96 px)
-  const BATTLE_TILE_PX = TILE_SIZE * 6  // 96px
+  // Build debate sprites — sizes are derived from canvas dimensions so they
+  // look correct regardless of screen resolution or window size.
+
+  // NPC tile: ~18 % of canvas height (source is 16 × 16 px)
+  const BATTLE_TILE_PX = Math.round(canvas.height * 0.18)
   npcDebateSprite = {
     position: { x: Math.round(canvas.width * 0.78), y: Math.round(canvas.height * 0.14) },
     draw() {
@@ -308,13 +310,15 @@ function initDebate(character) {
     }
   }
 
-  // Player on the left (where Emby was)
+  // Player sprite: scale so rendered height ≈ 22 % of canvas height
+  const playerNaturalH = playerDownImage.naturalHeight || 22
+  const playerScale    = (canvas.height * 0.22) / playerNaturalH
   playerDebateSprite = new Sprite({
     position: { x: Math.round(canvas.width * 0.27), y: Math.round(canvas.height * 0.56) },
     image: playerDownImage,
     frames: { max: 3, hold: 10 },
     animate: false,
-    scale: 5
+    scale: playerScale
   })
 
   debateRenderedSprites = [npcDebateSprite, playerDebateSprite]
@@ -335,7 +339,7 @@ function initDebate(character) {
 // ---- Battle render loop (canvas) ----
 function animateBattle() {
   battleAnimationId = window.requestAnimationFrame(animateBattle)
-  // Draw background stretched to fill whatever canvas size we have
+  c.clearRect(0, 0, canvas.width, canvas.height)
   c.drawImage(battleBackgroundImage, 0, 0, canvas.width, canvas.height)
   debateRenderedSprites.forEach((sprite) => sprite.draw())
 }
