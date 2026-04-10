@@ -80,7 +80,7 @@ function showNPCStatement(node, onReady) {
     <div style="font-size: ${uiSz('14px','11px')}; color: #aaa; letter-spacing: 1px; margin-bottom: 8px;">
       ${nameLabel} ARGUES:
     </div>
-    <div style="font-size: ${uiSz('14px','10px')}; line-height: 2; color: #222;">${node.label}</div>
+    <div style="font-size: ${uiSz('10px','14px')}; line-height: 2; color: #222;">${node.label}</div>
     ${onReady
       ? `<div style="font-size: ${uiSz('14px','10px')}; color: #bbb; margin-top: 10px; text-align: right;">[ click to respond ]</div>`
       : ''}
@@ -110,7 +110,7 @@ function showPlayerOptions(parentNodeId) {
   children.slice(0, 4).forEach((child) => {
     const button = document.createElement('button')
     button.innerHTML =
-      `<span style="font-size: ${uiSz('14px','10px')}; line-height: 2; color: #222;">${child.label}</span>`
+      `<span style="font-size: ${uiSz('10px','14px')}; line-height: 2; color: #222;">${child.label}</span>`
     button.addEventListener('click', () => onPlayerResponds(child))
     document.querySelector('#attacksBox').append(button)
   })
