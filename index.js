@@ -15,6 +15,15 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas)
 
 
+// ---- Version label (live commit hash from GitHub API) ----
+fetch('https://api.github.com/repos/EveraertJan/discuss_game/commits/main')
+  .then(r => r.json())
+  .then(d => {
+    const el = document.getElementById('versionLabel')
+    if (el && d.sha) el.textContent = d.sha.slice(0, 7)
+  })
+  .catch(() => {})
+
 // ---- Argument files (loaded from GitHub) ----
 window.argumentData  = null   // set per-debate in battleScene.js
 window.argumentFiles = []     // all files fetched from the repo
