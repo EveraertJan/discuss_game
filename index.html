@@ -137,9 +137,8 @@
       height: 100%;
     }
 
-    /* ---- Landscape: bigger text, taller panel ---- */
+    /* ---- Landscape: bigger text ---- */
     @media (orientation: landscape) {
-      #debatePanel  { min-height: 400px; }
       #dialogueBox  { font-size: 14px !important; }
       #attacksBox button { font-size: 12px; }
       #npcName      { font-size: 18px; }
@@ -151,7 +150,7 @@
       font-size: 7px;
       line-height: 1.6;
       text-align: left;
-      padding: 6px 8px;
+      padding: 20px;
       border: 0;
       border-right: 2px solid #eee;
       border-bottom: 2px solid #eee;
@@ -335,9 +334,9 @@
       </div>
     </div>
 
-    <!-- Bottom debate panel -->
+    <!-- Bottom debate panel: fills everything below the sprite strip -->
     <div id="debatePanel" style="
-      background:white; min-height:140px; position:absolute; bottom:0; left:0; right:0;
+      background:white; position:absolute; top:55%; bottom:0; left:0; right:0;
       border-top:4px black solid; display:flex;
     ">
       <!-- Dialogue overlay (click/tap to advance) -->

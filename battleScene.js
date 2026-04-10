@@ -77,12 +77,12 @@ function showNPCStatement(node, onReady) {
   box.style.display = 'block'
   box.onclick = null
   box.innerHTML = `
-    <div style="font-size: ${uiSz('7px','11px')}; color: #aaa; letter-spacing: 1px; margin-bottom: 8px;">
+    <div style="font-size: ${uiSz('14px','11px')}; color: #aaa; letter-spacing: 1px; margin-bottom: 8px;">
       ${nameLabel} ARGUES:
     </div>
-    <div style="font-size: ${uiSz('9px','14px')}; line-height: 1.8; color: #222;">${node.label}</div>
+    <div style="font-size: ${uiSz('14px','14px')}; line-height: 2; color: #222;">${node.label}</div>
     ${onReady
-      ? `<div style="font-size: ${uiSz('7px','10px')}; color: #bbb; margin-top: 10px; text-align: right;">[ click to respond ]</div>`
+      ? `<div style="font-size: ${uiSz('14px','10px')}; color: #bbb; margin-top: 10px; text-align: right;">[ click to respond ]</div>`
       : ''}
   `
 
@@ -110,7 +110,7 @@ function showPlayerOptions(parentNodeId) {
   children.slice(0, 4).forEach((child) => {
     const button = document.createElement('button')
     button.innerHTML =
-      `<span style="font-size: ${uiSz('7px','12px')}; line-height: 1.5; color: #222;">${child.label}</span>`
+      `<span style="font-size: ${uiSz('14px','12px')}; line-height: 2.2; color: #222;">${child.label}</span>`
     button.addEventListener('click', () => onPlayerResponds(child))
     document.querySelector('#attacksBox').append(button)
   })
@@ -130,16 +130,16 @@ function onPlayerResponds(node) {
   box.style.display = 'block'
   box.onclick = null
   box.innerHTML = `
-    <div style="font-size: ${uiSz('7px','11px')}; color: #1976D2; letter-spacing: 1px; margin-bottom: 8px;">YOU SAY:</div>
-    <div style="font-size: ${uiSz('9px','14px')}; line-height: 1.8; color: #222;">${node.label}</div>
+    <div style="font-size: ${uiSz('14px','14px')}; color: #1976D2; letter-spacing: 1px; margin-bottom: 8px;">YOU SAY:</div>
+    <div style="font-size: ${uiSz('14px','14px')}; line-height: 1.8; color: #222;">${node.label}</div>
   `
 
   // Fallacy — the NPC calls it out and the debate ends immediately
   if (node.type === 'fallacy') {
     setTimeout(() => {
       box.innerHTML = `
-        <div style="font-size: ${uiSz('8px','12px')}; color: #e53935; margin-bottom: 8px;">⚠ LOGICAL FALLACY</div>
-        <div style="font-size: ${uiSz('9px','14px')}; line-height: 1.8; color: #555;">
+        <div style="font-size: ${uiSz('14px','14px')}; color: #e53935; margin-bottom: 8px;">⚠ LOGICAL FALLACY</div>
+        <div style="font-size: ${uiSz('14px','14px')}; line-height: 1.8; color: #555;">
           The villager sees through it. The debate is over.
         </div>
       `
@@ -167,7 +167,7 @@ function onPlayerResponds(node) {
       setConviction(convictionLevel + GAIN_UNANSWERED)
       box.innerHTML = `
         <div style="font-size: ${uiSz('8px','12px')}; color: #4CAF50; margin-bottom: 8px;">💡 UNANSWERABLE POINT!</div>
-        <div style="font-size: ${uiSz('9px','14px')}; line-height: 1.8; color: #555;">
+        <div style="font-size: ${uiSz('14px','14px')}; line-height: 1.8; color: #555;">
           The villager has no counter to that argument.
         </div>
       `
@@ -219,11 +219,11 @@ function winDebate() {
     <div style="font-size: ${uiSz('12px','18px')}; color: #4CAF50; line-height: 2.2;">
       ✓ CONVINCED!
     </div>
-    <div style="font-size: ${uiSz('9px','14px')}; color: #333; line-height: 1.8;">
+    <div style="font-size: ${uiSz('14px','14px')}; color: #333; line-height: 1.8;">
       ${currentDebateNPC ? currentDebateNPC.name : 'The villager'} joins the movement!
     </div>
     ${isFirstWin ? `
-    <div style="font-size: ${uiSz('7px','11px')}; color: #888; line-height: 2; margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px;">
+    <div style="font-size: ${uiSz('14px','11px')}; color: #888; line-height: 2; margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px;">
       Convinced citizens gather at the protest in front of the factory.
     </div>` : ''}
   `
@@ -240,7 +240,7 @@ function loseDebate() {
   box.onclick = null
   box.innerHTML = `
     <div style="font-size: ${uiSz('10px','15px')}; color: #e53935; line-height: 2.2;">Not yet...</div>
-    <div style="font-size: ${uiSz('9px','14px')}; color: #555; line-height: 1.8;">
+    <div style="font-size: ${uiSz('14px','14px')}; color: #555; line-height: 1.8;">
       Keep working on your arguments. Come back and try again!
     </div>
   `
@@ -295,13 +295,11 @@ function initDebate(character) {
   document.querySelector('#attacksBox').replaceChildren()
   document.querySelector('#attackType').innerHTML = '—'
 
-  // Build debate sprites — sizes are derived from canvas dimensions so they
-  // look correct regardless of screen resolution or window size.
-
-  // NPC tile: ~18 % of canvas height (source is 16 × 16 px)
+  // Build debate sprites
   const BATTLE_TILE_PX = Math.round(canvas.height * 0.18)
+
   npcDebateSprite = {
-    position: { x: Math.round(canvas.width * 0.78), y: Math.round(canvas.height * 0.14) },
+    position: { x: Math.round(canvas.width * 0.78), y: Math.round(canvas.height * 0.15) },
     draw() {
       if (_tilemapImg && character.tileX !== null) {
         c.imageSmoothingEnabled = false
@@ -316,12 +314,11 @@ function initDebate(character) {
     }
   }
 
-  // Player sprite: scale so rendered height ≈ 22 % of canvas height
-  const playerNaturalH = playerDownImage.naturalHeight || 22
-  const playerScale    = (canvas.height * 0.22) / playerNaturalH
+  const playerNaturalH = playerUpImage.naturalHeight || 22
+  const playerScale    = (canvas.height * 0.30) / playerNaturalH
   playerDebateSprite = new Sprite({
-    position: { x: Math.round(canvas.width * 0.27), y: Math.round(canvas.height * 0.56) },
-    image: playerDownImage,
+    position: { x: Math.round(canvas.width * 0.06), y: Math.round(canvas.height * 0.35) },
+    image: playerUpImage,
     frames: { max: 3, hold: 10 },
     animate: false,
     scale: playerScale
@@ -333,7 +330,7 @@ function initDebate(character) {
     // Every file was empty — nothing to debate
     document.querySelector('#dialogueBox').style.display = 'block'
     document.querySelector('#dialogueBox').innerHTML =
-      '<div style="font-size: 9px;">No arguments found in any loaded file.</div>'
+      '<div style="font-size: 14px;">No arguments found in any loaded file.</div>'
     setTimeout(() => exitDebate(), 2500)
     return
   }
