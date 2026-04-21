@@ -144,27 +144,59 @@
       #npcName      { font-size: 18px; }
     }
 
-    /* ---- Debate button overrides ---- */
+    /* ---- Debate answer buttons: vertical scrollable list (Task 6) ---- */
+    #attacksBox {
+      flex-direction: column !important;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     #attacksBox button {
       font-family: 'Press Start 2P', cursive;
       font-size: 7px;
       line-height: 1.6;
       text-align: left;
-      padding: 20px;
+      padding: 18px 20px;
       border: 0;
-      border-right: 2px solid #eee;
       border-bottom: 2px solid #eee;
       background: white;
       cursor: pointer;
       word-break: break-word;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      height: auto;
+      width: 100%;
+      flex-shrink: 0;
     }
 
     #attacksBox button:active, #attacksBox button:hover {
       background: #f0f0f0;
+    }
+
+    /* ---- File selector chips (Task 5) ---- */
+    #fileSelector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin: 10px 0 4px;
+      max-width: 480px;
+    }
+
+    .file-chip {
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(5px, 1.4vw, 7px);
+      padding: 6px 12px;
+      border: 2px solid #555;
+      background: transparent;
+      color: #555;
+      cursor: pointer;
+      opacity: 0.45;
+      transition: opacity 0.15s, background 0.15s;
+    }
+
+    .file-chip.selected {
+      background: #222;
+      color: #fff;
+      border-color: #222;
+      opacity: 1;
     }
 
     /* ---- Virtual D-pad (fixed, always on top) ---- */
@@ -244,6 +276,8 @@
   </div>
 
   <div id="fileStatus" style="font-size:clamp(7px,2vw,9px); color:#555;">loading arguments…</div>
+
+  <div id="fileSelector"></div>
 
   <button id="startBtn">▶ START GAME</button>
 
@@ -347,9 +381,7 @@
       "></div>
 
       <!-- Argument buttons (full width, type hidden) -->
-      <div id="attacksBox" style="
-        width:100%; display:grid; grid-template-columns:repeat(2,1fr);
-      "></div>
+      <div id="attacksBox" style="width:100%; display:flex;"></div>
 
       <!-- ARG TYPE panel hidden — type is not shown to the player -->
       <div id="attackType" style="display:none;"></div>

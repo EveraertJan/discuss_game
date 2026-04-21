@@ -42,13 +42,18 @@ window.villagerTotal = 0
     statusEl.textContent = `loading ${jsonFiles.length} argument file${jsonFiles.length !== 1 ? 's' : ''}…`
 
     const loaded = await Promise.all(
-      jsonFiles.map(f => fetch(RAW + encodeURIComponent(f.name)).then(r => r.json()))
+      jsonFiles.map(f =>
+        fetch(RAW + encodeURIComponent(f.name))
+          .then(r => r.json())
+          .then(data => { data._filename = f.name.replace(/\.json$/i, ''); return data })
+      )
     )
 
     window.argumentFiles = loaded.filter(d => d.nodes && Array.isArray(d.nodes))
 
     statusEl.textContent  = `✓ ${window.argumentFiles.length} argument file${window.argumentFiles.length !== 1 ? 's' : ''} loaded`
     statusEl.classList.add('loaded')
+    populateFileSelector(window.argumentFiles)
     checkStartReady()
   } catch (err) {
     statusEl.textContent = '✗ could not load arguments from GitHub'
@@ -121,6 +126,30 @@ function checkStartReady() {
   if (window.argumentFiles.length > 0 && assetsLoaded) {
     document.querySelector('#startBtn').classList.add('ready')
   }
+}
+
+// ---- File selector (Task 5) ----
+function populateFileSelector(files) {
+  const sel = document.getElementById('fileSelector')
+  if (!sel) return
+  sel.innerHTML = ''
+  files.forEach((file, i) => {
+    const chip = document.createElement('button')
+    chip.className    = 'file-chip selected'
+    chip.dataset.index = i
+    chip.textContent  = file._filename || ('File ' + (i + 1))
+    chip.addEventListener('click', () => chip.classList.toggle('selected'))
+    sel.appendChild(chip)
+  })
+}
+
+function getActiveFiles() {
+  const sel = document.getElementById('fileSelector')
+  if (!sel) return window.argumentFiles
+  const selected = Array.from(sel.querySelectorAll('.file-chip.selected'))
+    .map(el => window.argumentFiles[parseInt(el.dataset.index)])
+    .filter(Boolean)
+  return selected.length > 0 ? selected : window.argumentFiles
 }
 
 // ---- Start button ----
@@ -246,8 +275,38 @@ function initGame() {
     })
   }
 
+  // ---- Task 8: assign one unique root claim per debatable NPC ----
+  // Count root claims across the active argument files.
+  // Limit debatable NPCs to that count so no repetition occurs.
+  const activeFiles = getActiveFiles()
+  const allRootClaims = []
+  activeFiles.forEach(file => {
+    file.nodes
+      .filter(n => n.parentId === null && n.type === 'claim')
+      .forEach(root => allRootClaims.push({ file, root }))
+  })
+
+  // Shuffle so NPC↔claim pairing varies each run
+  for (let i = allRootClaims.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[allRootClaims[i], allRootClaims[j]] = [allRootClaims[j], allRootClaims[i]]
+  }
+
+  const debatableChars = characters.filter(ch => ch.debatable)
+  const nonDebatable   = characters.filter(ch => !ch.debatable)
+  const usedDebatable  = debatableChars.slice(0, allRootClaims.length)
+
+  usedDebatable.forEach((ch, i) => {
+    ch.assignedFile      = allRootClaims[i].file
+    ch.assignedRootClaim = allRootClaims[i].root
+  })
+
+  // Remove surplus villagers (no claim to debate)
+  characters = [...usedDebatable, ...nonDebatable]
+
   // Expose total debatable villager count for the HUD
-  window.villagerTotal = characters.filter(ch => ch.debatable).length
+  window.villagerTotal = usedDebatable.length
+  document.querySelector('#movementCount').textContent = '0 of ' + window.villagerTotal
 
   // Build movables / renderables lists
   // All world-space objects must be in movables so the camera scroll applies to them.
@@ -326,22 +385,22 @@ function animate() {
   if (keys.w.pressed && lastKey === 'w') {
     player.animate = true; player.image = player.sprites.up
     checkForCharacterCollision({ characters, player })
-    if (!wouldCollide(0, 3))  movables.forEach(m => m.position.y += 3)
+    if (!wouldCollide(0, 5))  movables.forEach(m => m.position.y += 5)
 
   } else if (keys.a.pressed && lastKey === 'a') {
     player.animate = true; player.image = player.sprites.left
     checkForCharacterCollision({ characters, player })
-    if (!wouldCollide(3, 0))  movables.forEach(m => m.position.x += 3)
+    if (!wouldCollide(5, 0))  movables.forEach(m => m.position.x += 5)
 
   } else if (keys.s.pressed && lastKey === 's') {
     player.animate = true; player.image = player.sprites.down
     checkForCharacterCollision({ characters, player })
-    if (!wouldCollide(0, -3)) movables.forEach(m => m.position.y -= 3)
+    if (!wouldCollide(0, -5)) movables.forEach(m => m.position.y -= 5)
 
   } else if (keys.d.pressed && lastKey === 'd') {
     player.animate = true; player.image = player.sprites.right
     checkForCharacterCollision({ characters, player })
-    if (!wouldCollide(-3, 0)) movables.forEach(m => m.position.x -= 3)
+    if (!wouldCollide(-5, 0)) movables.forEach(m => m.position.x -= 5)
   }
 }
 
